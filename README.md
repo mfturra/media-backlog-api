@@ -28,8 +28,8 @@ string Publisher
 uuid   ID
 
 Each type should supprt 
-- GET /<resource> 
-- GET /<resource>/<uuid>
-- POST /<resource>
-- PATCH /<resource>/<uuid>
-- DELETE /<resource>/<uuid>
+- GET /\<resource\> 
+- GET /\<resource\/\<uuid\>
+- POST /\<resource\>
+- PATCH /\<resource\>/\<uuid\>
+- DELETE /\<resource\>/\<uuid\>
