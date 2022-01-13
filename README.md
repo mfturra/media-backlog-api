@@ -27,6 +27,7 @@ date   Release Date
 string Publisher  
 uuid   ID  
 
+## REST Actions
 Each type should supprt 
 - GET /\<resource\> 
 - GET /\<resource\/\<uuid\>
