@@ -1,5 +1,3 @@
-# Configuration Handling Condition States
-
+# Configuration Handling of Environment Variables
 # Faciliate debugging errors in the code
 FLASK_DEBUG = True
-TEMPLATE_AUTO_RELOAD = True
