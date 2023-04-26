@@ -14,7 +14,7 @@ def info_pull(resource):
     return "Pull general information on video games that are being requested."
 
 
-@app.route('/videogames/uuid', methods=['GET', 'PATCH', 'DELETE'])
+@app.route('/videogames/<uuid>', methods=['GET', 'PATCH', 'DELETE'])
 def unique_info(resource):
     assert resource == request.view_args['resource']
     return "Pull specific info on video games in database."
