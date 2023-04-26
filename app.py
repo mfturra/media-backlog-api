@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 @app.route('/videogames')
 def index():
-    return "Main page for video game inclusion."
+    return "Main page for video game directory."
 
 
 @app.route('/videogames', methods=['GET', 'POST'])

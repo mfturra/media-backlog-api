@@ -121,6 +121,7 @@ celerybeat.pid
 
 # Environments
 .env
+.flaskenv
 .venv
 env/
 venv/
@@ -128,9 +129,6 @@ ENV/
 env.bak/
 venv.bak/
 
-# Handling Flask Environment Variables
-# Faciliates debugging code errors
-FLASK_DEBUG = True
 
 # Spyder project settings
 .spyderproject
