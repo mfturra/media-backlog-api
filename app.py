@@ -43,7 +43,7 @@ def videogame_POST():
     '''videogame = VideoGame.from_json(videogame_entry)
     print(videogame)'''
 
-    return "Pull general information on video games that are being requested."
+    '''return "Pull general information on video games that are being requested."'''
 
 
 @app.route('/videogames/<uuid>', methods=['GET', 'PATCH', 'DELETE'])
