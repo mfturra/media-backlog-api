@@ -5,54 +5,43 @@ app = Flask(__name__)
 # Videogame Class Definition
 # Initialize an instance of Class
 
-# Example
-v = {
-    "name": "Spiderman 2",
-    "platform": "PlayStation"
-}
-
 
 class VideoGame:
-    def __init__(self, name, platform):
-        self.gameName = name
-        self.gamePlatform = platform
+    def __init__(self, title, platform):
+        self.title = title
+        self.platform = platform
+
+    def from_json(cls, videogame_entry):
+        # Acquire json dictionary and output as string
+        json_dict = json.loads(videogame_entry)
+        return cls(**json_dict)
 
 
 @app.route('/videogames')
-def index():
+def videogame_GET():
     return "Main page for video game directory."
 
 
-@app.route('/videogames', methods=['GET', 'POST'])
-def info_pull(resource):
-    assert resource == request.view_args['resource']
+@app.route('/videogames', methods=['POST'])
+def videogame_POST():
+    try:
+        if request.is_json:
+            # Process the json data from the message body and store in data variable
+            data = request.get_json()
 
-    if request.method == "POST":
-        try:
-            @classmethod
-            def from_json(cls, videogame_entry):
-                # Acquire json dictionary and output as string
-                json_dict = json.loads(videogame_entry)
-                return cls(**json_dict)
+            # Store data content in VideoGame class
+            videogame = VideoGame(data["title"], data["platform"])
 
-            def __repr__(self):
-                return f'<Success! A new entry has been included for {self.gameName} on {self.gamePlatform}>'
+            # Produce an output to the server on the terminal side to know that the job was done.
+            return f"Successful submission of {videogame.title} and {videogame.platform} to the database."
+    except:
+        print(f"Error. Database wasn't updated properly.")
 
-            # curl -X POST http://127.0.0.1:5000/videogames -H "Content-Type: application/json" -d '{"name": "Spiderman 2","platform": "PlayStation"}'
+    # curl -X POST http://127.0.0.1:5000/videogames/ -H "Content-Type: application/json" -d '{"title":"Spiderman 2", "platform":"PlayStation"}'
 
-            videogame_entry = '''{
-                "name": "Spiderman 2",
-                "platform": "PlayStation"
-                }'''
+    '''videogame = VideoGame.from_json(videogame_entry)
+    print(videogame)'''
 
-            videogame = VideoGame.from_json(videogame_entry)
-            print(videogame)
-
-            '''else:
-                print(f"Error. Database wasn't updated properly.")'''
-
-        except ValueError as e:
-            print("Error: ", e)
     return "Pull general information on video games that are being requested."
 
 
