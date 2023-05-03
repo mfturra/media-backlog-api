@@ -36,8 +36,9 @@ def videogame_POST():
             return f"Successful submission of {videogame.title} and {videogame.platform} to the database."
     except:
         print(f"Error. Database wasn't updated properly.")
+        return f"Error. Database wasn't updated properly."
 
-    # curl -X POST http://127.0.0.1:5000/videogames/ -H "Content-Type: application/json" -d '{"title":"Spiderman 2", "platform":"PlayStation"}'
+    # curl -X POST http://127.0.0.1:5000/videogames -H "Content-Type: application/json" -d '{"title":"Spiderman 2", "platform":"PlayStation"}'
 
     '''videogame = VideoGame.from_json(videogame_entry)
     print(videogame)'''
@@ -46,8 +47,8 @@ def videogame_POST():
 
 
 @app.route('/videogames/<uuid>', methods=['GET', 'PATCH', 'DELETE'])
-def unique_info(resource):
-    assert resource == request.view_args['resource']
+def unique_info(uuid):
+    assert resource == request.view_args['uuid']
     return "Pull specific info on video games in database."
 
 
