@@ -37,7 +37,7 @@ def videogame_POST():
             data = request.get_json()
 
             # Validate json data
-            try:
+            if isinstance(data, VideoGame):
                 isinstance(data, VideoGame)
 
                 # Store data content in VideoGame class
@@ -45,7 +45,7 @@ def videogame_POST():
 
                 # Produce an output to the server on the terminal side to know that the job was done.
                 return f"Successful submission of {videogame.title} and {videogame.platform} to the database."
-            except ValueError as err:
+            else:  # ValueError as err:
                 print(f"Error. Database wasn't updated properly.")
 
     except ValueError as err:

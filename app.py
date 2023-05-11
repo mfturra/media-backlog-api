@@ -24,26 +24,38 @@ def videogame_GET():
 
 @app.route('/videogames', methods=['POST'])
 def videogame_POST():
-    try:
-        if request.is_json:
-            # Process the json data from the message body and store in data variable
-            data = request.get_json()
+    # try:
+    if request.is_json:
+        # Process the json data from the message body and store in data variable
 
-            # Store data content in VideoGame class
+        data = request.get_json()
+        print(data)
+        if data in VideoGame.title():
+            # breakpoint("Stop 2")
             videogame = VideoGame(data["title"], data["platform"])
-
+            print(videogame)
             # Produce an output to the server on the terminal side to know that the job was done.
             return f"Successful submission of {videogame.title} and {videogame.platform} to the database."
-    except:
-        print(f"Error. Database wasn't updated properly.")
-        return f"Error. Database wasn't updated properly."
+        else:
+            print("Error handling stopped here")
+            return f'Issues with handling {data}'
+        # for key in data:
+        #     print(key)
+            if key in VideoGame.keys():
+                # breakpoint("Stop 2")
+                videogame = VideoGame(data["title"], data["platform"])
+                print(videogame)
+                # Produce an output to the server on the terminal side to know that the job was done.
+                return f"Successful submission of {videogame.title} and {videogame.platform} to the database."
+            else:
+                print("Error handling stopped here")
+                return f'Issues with handling {data}'
+    # except:
+    #     print(f"Error. Database wasn't updated properly.")
+    #     return f"Error. Database wasn't updated properly."
 
-    # curl -X POST http://127.0.0.1:5000/videogames -H "Content-Type: application/json" -d '{"title":"Spiderman 2", "platform":"PlayStation"}'
-
-    '''videogame = VideoGame.from_json(videogame_entry)
-    print(videogame)'''
-
-    '''return "Pull general information on video games that are being requested."'''
+    # Successful POST: curl -X POST http://127.0.0.1:5000/videogames -H "Content-Type: application/json" -d '{"title":"Spiderman 2", "platform":"PlayStation"}'
+    # Inaccurate JSON file: curl -X POST http://127.0.0.1:5000/videogames -H "Content-Type: application/json" -d '{"name":"Spiderman 2", "platform":"PlayStation 2"}'
 
 
 @app.route('/videogames/<uuid>', methods=['GET', 'PATCH', 'DELETE'])
