@@ -1,9 +1,7 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, Response
+import uuid
 
 app = Flask(__name__)
-
-# Videogame Class Definition
-# Initialize an instance of Class
 
 
 class VideoGame:
@@ -29,19 +27,35 @@ def videogame_POST():
         # Process the json data from the message body and store in data variable
 
         data = request.get_json()
-        print(data)
-        if data in VideoGame.title():
-            # breakpoint("Stop 2")
+
+        # Evaluate if key in data set
+        if "title" in data.keys() and "platform" in data.keys():
             videogame = VideoGame(data["title"], data["platform"])
-            print(videogame)
-            # Produce an output to the server on the terminal side to know that the job was done.
-            return f"Successful submission of {videogame.title} and {videogame.platform} to the database."
+            print(videogame["title"])
+            # Generate uuid for each new videogame entry
+            videogame_uuid = uuid.uuid4()
+
+            # Produce successful submission of entry
+            print(videogame_uuid)
+            return Response("{'title': 'videogame['title']','platform': 'videogame['platform']','uuid': 'uuid here','resource_path': '/endpoint/goes/here/uuid'}",
+                            status=201, mimetype='application/json')
+            # f"Successful submission of {videogame.title} and {videogame.platform} to the database."
+
+        elif "title" in data.keys() and "platform" not in data.keys():
+            print("Title wasn't included in data set submission")
+            return Response("{'message': 'Title wasn't included in data set submission', 'endpoint': '/videogames'}",
+                            status=400, mimetype='application/json')
+
+        elif "title" not in data.keys() and "platform" in data.keys():
+            print("Platform wasn't included in data set submission")
+            return Response("{'message': 'Platform wasn't included in data set submission', 'endpoint': '/videogames'}",
+                            status=400, mimetype='application/json')
+
         else:
-            print("Error handling stopped here")
-            return f'Issues with handling {data}'
+            return 'Request not being understood. Check previous if and elif statements'
+
         # for key in data:
-        #     print(key)
-            if key in VideoGame.keys():
+            '''if key in VideoGame.keys():
                 # breakpoint("Stop 2")
                 videogame = VideoGame(data["title"], data["platform"])
                 print(videogame)
@@ -49,7 +63,7 @@ def videogame_POST():
                 return f"Successful submission of {videogame.title} and {videogame.platform} to the database."
             else:
                 print("Error handling stopped here")
-                return f'Issues with handling {data}'
+                return f'Issues with handling {data}'''
     # except:
     #     print(f"Error. Database wasn't updated properly.")
     #     return f"Error. Database wasn't updated properly."
