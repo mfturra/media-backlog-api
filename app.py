@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, Response
+from flask import Flask, render_template, request, make_response, jsonify
 import uuid
 
 app = Flask(__name__)
@@ -8,6 +8,7 @@ class VideoGame:
     def __init__(self, title, platform):
         self.title = title
         self.platform = platform
+        self.uuid = uuid
 
     def from_json(cls, videogame_entry):
         # Acquire json dictionary and output as string
@@ -30,15 +31,21 @@ def videogame_POST():
 
         # Evaluate if key in data set
         if "title" in data.keys() and "platform" in data.keys():
+            # Save title and platform dict values into videogame variable
             videogame = VideoGame(data["title"], data["platform"])
-            print(videogame["title"])
-            # Generate uuid for each new videogame entry
-            videogame_uuid = uuid.uuid4()
 
-            # Produce successful submission of entry
-            print(videogame_uuid)
-            return Response("{'title': 'videogame['title']','platform': 'videogame['platform']','uuid': 'uuid here','resource_path': '/endpoint/goes/here/uuid'}",
-                            status=201, mimetype='application/json')
+            # Generate uuid for each new videogame entry
+            new_uuid = uuid.uuid4()
+
+            # Pass uuid property into VideoGame Class
+            videogame.uuid = new_uuid
+
+            # Generate successful response for submission
+            response = make_response(
+                jsonify("{'title': 'videogame.title','platform': 'videogame.platform','uuid': 'videogame.uuid','resource_path': '/endpoint/goes/here/uuid'}"), 201)
+            response.headers["Content-Type"] = "application/json"
+            # response = "Working on it"
+            return response
             # f"Successful submission of {videogame.title} and {videogame.platform} to the database."
 
         elif "title" in data.keys() and "platform" not in data.keys():
@@ -56,7 +63,6 @@ def videogame_POST():
 
         # for key in data:
             '''if key in VideoGame.keys():
-                # breakpoint("Stop 2")
                 videogame = VideoGame(data["title"], data["platform"])
                 print(videogame)
                 # Produce an output to the server on the terminal side to know that the job was done.
