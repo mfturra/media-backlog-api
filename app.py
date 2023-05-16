@@ -41,9 +41,9 @@ def videogame_POST():
             videogame.uuid = new_uuid
 
             # Generate successful response for submission
-            response = make_response(
-                jsonify("{'title': 'videogame.title','platform': 'videogame.platform','uuid': 'videogame.uuid','resource_path': '/endpoint/goes/here/uuid'}"), 201)
-            response.headers["Content-Type"] = "application/json"
+            response = (
+                jsonify("{'title': f'{videogame.title}','platform': f'{videogame.platform}','uuid': f'{videogame.uuid}','resource_path': '/videogame/{videogame.uuid}'}"))
+            # response.headers["Content-Type"] = "application/json"
             # response = "Working on it"
             return response
             # f"Successful submission of {videogame.title} and {videogame.platform} to the database."
