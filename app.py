@@ -26,7 +26,6 @@ def videogame_POST():
     # try:
     if request.is_json:
         # Process the json data from the message body and store in data variable
-
         data = request.get_json()
 
         # Evaluate if key in data set
@@ -34,45 +33,40 @@ def videogame_POST():
             # Save title and platform dict values into videogame variable
             videogame = VideoGame(data["title"], data["platform"])
 
-            # Generate uuid for each new videogame entry
-            new_uuid = uuid.uuid4()
-
-            # Pass uuid property into VideoGame Class
-            videogame.uuid = new_uuid
+            # Generate and pass uuid property for each new videogame entry
+            data["uuid"] = uuid.uuid4()
+            data["resource-path"] = f'/videogame/{data["uuid"]}'
+            data["status code"] = 201
 
             # Generate successful response for submission
-            response = (
-                jsonify("{'title': f'{videogame.title}','platform': f'{videogame.platform}','uuid': f'{videogame.uuid}','resource_path': '/videogame/{videogame.uuid}'}"))
-            # response.headers["Content-Type"] = "application/json"
-            # response = "Working on it"
-            return response
-            # f"Successful submission of {videogame.title} and {videogame.platform} to the database."
+            return jsonify(data)
 
         elif "title" in data.keys() and "platform" not in data.keys():
+            missing_platform = {}
+
+            # Store specific message in missing_title dict
+            missing_platform["message"] = "Platform wasn't included in data set submission"
+            missing_platform["endpoint"] = "/videogames"
+            missing_platform["status code"] = 403
+
             print("Title wasn't included in data set submission")
-            return Response("{'message': 'Title wasn't included in data set submission', 'endpoint': '/videogames'}",
-                            status=400, mimetype='application/json')
+            return jsonify(missing_platform)
 
         elif "title" not in data.keys() and "platform" in data.keys():
+            missing_title = {}
+
+            # Store specific message in missing_title dict
+            missing_title["message"] = "Title wasn't included in data set submission"
+            missing_title["endpoint"] = "/videogames"
+            missing_title["status code"] = 403
+
+            # Store specific message in missing_title dict
+
             print("Platform wasn't included in data set submission")
-            return Response("{'message': 'Platform wasn't included in data set submission', 'endpoint': '/videogames'}",
-                            status=400, mimetype='application/json')
+            return jsonify(missing_title)
 
         else:
             return 'Request not being understood. Check previous if and elif statements'
-
-        # for key in data:
-            '''if key in VideoGame.keys():
-                videogame = VideoGame(data["title"], data["platform"])
-                print(videogame)
-                # Produce an output to the server on the terminal side to know that the job was done.
-                return f"Successful submission of {videogame.title} and {videogame.platform} to the database."
-            else:
-                print("Error handling stopped here")
-                return f'Issues with handling {data}'''
-    # except:
-    #     print(f"Error. Database wasn't updated properly.")
-    #     return f"Error. Database wasn't updated properly."
 
     # Successful POST: curl -X POST http://127.0.0.1:5000/videogames -H "Content-Type: application/json" -d '{"title":"Spiderman 2", "platform":"PlayStation"}'
     # Inaccurate JSON file: curl -X POST http://127.0.0.1:5000/videogames -H "Content-Type: application/json" -d '{"name":"Spiderman 2", "platform":"PlayStation 2"}'
