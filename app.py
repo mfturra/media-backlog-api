@@ -29,6 +29,9 @@ def videogame_POST():
         data = request.get_json()
 
         # Evaluate if key in data set
+        error_message = {}
+        error_message["endpoint"] = "/videogames"
+
         if "title" in data.keys() and "platform" in data.keys():
             # Save title and platform dict values into videogame variable
             videogame = VideoGame(data["title"], data["platform"])
@@ -36,34 +39,18 @@ def videogame_POST():
             # Generate and pass uuid property for each new videogame entry
             data["uuid"] = uuid.uuid4()
             data["resource-path"] = f'/videogame/{data["uuid"]}'
-            data["status code"] = 201
+            # data["status code"] = 201
 
             # Generate successful response for submission
-            return jsonify(data)
+            return jsonify(data), 201
 
-        elif "title" in data.keys() and "platform" not in data.keys():
-            missing_platform = {}
+        if "title" not in data.keys():
+            error_message["message"] = "Title wasn't included in data set submission"
+            return jsonify(error_message), 403
 
-            # Store specific message in missing_title dict
-            missing_platform["message"] = "Platform wasn't included in data set submission"
-            missing_platform["endpoint"] = "/videogames"
-            missing_platform["status code"] = 403
-
-            print("Title wasn't included in data set submission")
-            return jsonify(missing_platform)
-
-        elif "title" not in data.keys() and "platform" in data.keys():
-            missing_title = {}
-
-            # Store specific message in missing_title dict
-            missing_title["message"] = "Title wasn't included in data set submission"
-            missing_title["endpoint"] = "/videogames"
-            missing_title["status code"] = 403
-
-            # Store specific message in missing_title dict
-
-            print("Platform wasn't included in data set submission")
-            return jsonify(missing_title)
+        elif "platform" not in data.keys():
+            error_message["message"] = "Platform wasn't included in data set submission"
+            return jsonify(missing_platform), 403
 
         else:
             return 'Request not being understood. Check previous if and elif statements'
