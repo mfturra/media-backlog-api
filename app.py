@@ -39,18 +39,17 @@ def videogame_POST():
             # Generate and pass uuid property for each new videogame entry
             data["uuid"] = uuid.uuid4()
             data["resource-path"] = f'/videogame/{data["uuid"]}'
-            # data["status code"] = 201
 
             # Generate successful response for submission
             return jsonify(data), 201
 
         if "title" not in data.keys():
             error_message["message"] = "Title wasn't included in data set submission"
-            return jsonify(error_message), 403
+            return jsonify(error_message), 400
 
         elif "platform" not in data.keys():
             error_message["message"] = "Platform wasn't included in data set submission"
-            return jsonify(missing_platform), 403
+            return jsonify(error_message), 400
 
         else:
             return 'Request not being understood. Check previous if and elif statements'
