@@ -1,19 +1,22 @@
+# from models import VideoGame
 from flask import Flask, render_template, request, make_response, jsonify
+from flask_sqlalchemy import SQLAlchemy
+import os
 import uuid
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///media_backlog_api'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
 
+from models import VideoGame
 
-class VideoGame:
-    def __init__(self, title, platform):
-        self.title = title
-        self.platform = platform
-        self.uuid = uuid
+# Run in terminal to connect database: export DATABASE_URL="postgresql:///media_backlog_api"
 
-    def from_json(cls, videogame_entry):
-        # Acquire json dictionary and output as string
-        json_dict = json.loads(videogame_entry)
-        return cls(**json_dict)
+#     def from_json(cls, videogame_entry):
+#         # Acquire json dictionary and output as string
+#         json_dict = json.loads(videogame_entry)
+#         return cls(**json_dict)
 
 
 @app.route('/videogames')
@@ -66,3 +69,6 @@ def unique_info(uuid):
 
 if __name__ == '__main__':
     app.run()
+
+# Import and register VideoGame model (Moved below the db object due to issues with initialization)
+# from app import db
