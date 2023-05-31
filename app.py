@@ -36,8 +36,10 @@ def videogame_POST():
         error_message["endpoint"] = "/videogames"
 
         if "title" in data.keys() and "platform" in data.keys():
-            # Save title and platform dict values into videogame variable
-            videogame = VideoGame(data["title"], data["platform"])
+            # Save title and platform dict values into videogame variable. Constructor creates an empty arg. 
+            videogame = VideoGame()
+            videogame.videogame_title = data["title"]
+            videogame.videogame_platform = data["platform"]
 
             # Generate and pass uuid property for each new videogame entry
             data["uuid"] = uuid.uuid4()

@@ -6,7 +6,7 @@ Base = declarative_base()
 metadata = Base.metadata
 
 
-class Videogame(Base):
+class VideoGame(Base):
     __tablename__ = 'videogames'
 
     videogame_id = Column(Integer, primary_key=True)
