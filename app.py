@@ -9,7 +9,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///media_backlog_api'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-from models import VideoGame
+from models import Videogame
 
 # Run in terminal to connect database: export DATABASE_URL="postgresql:///media_backlog_api"
 
@@ -37,13 +37,21 @@ def videogame_POST():
 
         if "title" in data.keys() and "platform" in data.keys():
             # Save title and platform dict values into videogame variable. Constructor creates an empty arg. 
-            videogame = VideoGame()
+            videogame = Videogame()
             videogame.videogame_title = data["title"]
             videogame.videogame_platform = data["platform"]
+            videogame.videogame_releasedate = data["releasedate"]
+            videogame.videogame_publisher = data["publisher"]
+
+            videogame.videogame_id = str(uuid.uuid4())
+            db.session.add(videogame)
+            db.session.commit()
 
             # Generate and pass uuid property for each new videogame entry
-            data["uuid"] = uuid.uuid4()
+            data["uuid"] = videogame.videogame_id
             data["resource-path"] = f'/videogame/{data["uuid"]}'
+
+            # SQLAlchemy. Review db.session.commit() func
 
             # Generate successful response for submission
             return jsonify(data), 201
@@ -64,9 +72,14 @@ def videogame_POST():
 
 
 @app.route('/videogames/<uuid>', methods=['GET', 'PATCH', 'DELETE'])
-def unique_info(uuid):
-    assert resource == request.view_args['uuid']
-    return "Pull specific info on video games in database."
+def info_query(uuid):
+    # if uuid not in db, return a 400, bad request error
+    db_entry = request.args('uuid_placeholder')
+    return '''
+                <h1>Requested database entry: {}</h1>'''.format(db_entry)
+
+    # assert resource == request.view_args['uuid']
+    # return "Pull specific info on video games in database."
 
 
 if __name__ == '__main__':
