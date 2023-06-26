@@ -68,9 +68,10 @@ def videogame_POST():
             return 'Request not being understood. Check previous if and elif statements'
 
 
-@app.route('/videogames/<uuid>', methods=['GET', 'PATCH', 'DELETE'])
+@app.route('/videogames/<uuid>', methods=['GET'])
+# GET Request Example: curl -X GET http://127.0.0.1:5000/videogames/88cb6cae-f55b-4f65-839c-ab58a5d88e91
+# Query for UUID entry in the Videogame Database
 def info_query(uuid):
-    # if uuid not in db, return a 400, bad request error
     entry_info = db.session.query(Videogame).filter(Videogame.videogame_id == uuid).first()
     if entry_info:
         # print(f"The requested ID is: {entry_info.videogame_id}\nThe title is: {entry_info.videogame_title}\nThe platform is: {entry_info.videogame_platform}")
@@ -78,8 +79,18 @@ def info_query(uuid):
 
     else:
         return "Entry not found."
-# Successful GET Request: curl -X GET http://127.0.0.1:5000/videogames/88cb6cae-f55b-4f65-839c-ab58a5d88e91
 
+@app.route('/videogames/<uuid>', methods=['DELETE'])
+# DELETE Request Example: curl -X DELETE http://127.0.0.1:5000/videogames/88cb6cae-f55b-4f65-839c-ab58a5d88e91
+# Query for UUID entry and delete entry
+def delete_entry(uuid):
+    entry_info = db.session.query(Videogame).filter(Videogame.videogame_id == uuid).first()
+    if entry_info:
+        db.session.delete(entry_info)
+        db.session.commit()
+        return "Entry has been deleted."
+    else:
+        return "Entry not found."
 
 
 if __name__ == '__main__':
