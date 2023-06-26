@@ -71,9 +71,11 @@ def videogame_POST():
 @app.route('/videogames/<uuid>', methods=['GET', 'PATCH', 'DELETE'])
 def info_query(uuid):
     # if uuid not in db, return a 400, bad request error
-    entry_info = Videogame.query.get(uuid)
+    entry_info = db.session.query(Videogame).filter(Videogame.videogame_id == uuid).first()
     if entry_info:
-        return f"The requested ID is: {entry_info.videogame_id}"
+        # print(f"The requested ID is: {entry_info.videogame_id}\nThe title is: {entry_info.videogame_title}\nThe platform is: {entry_info.videogame_platform}")
+        return f"The requested ID is: {entry_info.videogame_id}\nThe title is: {entry_info.videogame_title}\nThe platform is: {entry_info.videogame_platform}\nThe release date is: {entry_info.videogame_releasedate}\nThe publisher is: {entry_info.videogame_publisher}"
+
     else:
         return "Entry not found."
 # Successful GET Request: curl -X GET http://127.0.0.1:5000/videogames/88cb6cae-f55b-4f65-839c-ab58a5d88e91
