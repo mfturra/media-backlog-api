@@ -13,18 +13,15 @@ from models import Videogame
 
 # Run in terminal to connect database: export DATABASE_URL="postgresql:///media_backlog_api"
 
-#     def from_json(cls, videogame_entry):
-#         # Acquire json dictionary and output as string
-#         json_dict = json.loads(videogame_entry)
-#         return cls(**json_dict)
+@app.route('/videogames', methods=['GET'])
+def videogame_main():
+    return "Welcome to the main videogames archive page!"
 
-
-'''@app.route('/videogames')
-def videogame_GET():
-    return "Main page for video game directory."
-'''
 
 @app.route('/videogames', methods=['POST'])
+# Successful POST request example: curl -X POST http://127.0.0.1:5000/videogames -H "Content-Type: application/json" -d '{"title":"Spiderman 2", "platform":"PlayStation"}'
+# Inaccurate JSON example: curl -X POST http://127.0.0.1:5000/videogames -H "Content-Type: application/json" -d '{"name":"Spiderman 2", "platform":"PlayStation 2"}'
+
 def videogame_POST():
     # try:
     if request.is_json:
@@ -54,15 +51,15 @@ def videogame_POST():
             # SQLAlchemy. Review db.session.commit() func
 
             # Generate successful response for submission
-            return jsonify(data), 201
+            return jsonify(data), 201 # Created
 
         if "title" not in data.keys():
             error_message["message"] = "Title wasn't included in data set submission"
-            return jsonify(error_message), 400
+            return jsonify(error_message), 400 # Bad request
 
         elif "platform" not in data.keys():
             error_message["message"] = "Platform wasn't included in data set submission"
-            return jsonify(error_message), 400
+            return jsonify(error_message), 400 # Bad request
 
         else:
             return 'Request not being understood. Check previous if and elif statements'
@@ -75,10 +72,12 @@ def info_query(uuid):
     entry_info = db.session.query(Videogame).filter(Videogame.videogame_id == uuid).first()
     if entry_info:
         # print(f"The requested ID is: {entry_info.videogame_id}\nThe title is: {entry_info.videogame_title}\nThe platform is: {entry_info.videogame_platform}")
-        return f"The requested ID is: {entry_info.videogame_id}\nThe title is: {entry_info.videogame_title}\nThe platform is: {entry_info.videogame_platform}\nThe release date is: {entry_info.videogame_releasedate}\nThe publisher is: {entry_info.videogame_publisher}"
+        videogame_query = "The requested ID is: {entry_info.videogame_id}\nThe title is: {entry_info.videogame_title}\nThe platform is: {entry_info.videogame_platform}\nThe release date is: {entry_info.videogame_releasedate}\nThe publisher is: {entry_info.videogame_publisher}"
+        return jsonify(videogame_query), 200 # OK
 
     else:
-        return "Entry not found."
+        query_notfound = "Entry not found."
+        return jsonify(query_notfound), 400 # Bad request
 
 @app.route('/videogames/<uuid>', methods=['DELETE'])
 # DELETE Request Example: curl -X DELETE http://127.0.0.1:5000/videogames/88cb6cae-f55b-4f65-839c-ab58a5d88e91
@@ -88,14 +87,11 @@ def delete_entry(uuid):
     if entry_info:
         db.session.delete(entry_info)
         db.session.commit()
-        return "Entry has been deleted."
+        query_deleted = "Entry has been deleted."
+        return jsonify(query_deleted), 200 # OK
     else:
-        return "Entry not found."
+        return jsonify(query_notfound), 400 # Bad request
 
 
 if __name__ == '__main__':
     app.run()
-
-
-# Successful POST: curl -X POST http://127.0.0.1:5000/videogames -H "Content-Type: application/json" -d '{"title":"Spiderman 2", "platform":"PlayStation"}'
-# Inaccurate JSON file: curl -X POST http://127.0.0.1:5000/videogames -H "Content-Type: application/json" -d '{"name":"Spiderman 2", "platform":"PlayStation 2"}'
