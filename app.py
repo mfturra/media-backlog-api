@@ -16,7 +16,27 @@ from models import Videogame
 @app.route('/videogames', methods=['GET'])
 def videogame_main():
     query_all = db.session.query(Videogame).all()
-    return f"These are the videogame database entries: {query_all}"
+
+    # Empty list to store all entries
+    all_entries = []
+
+    # Iterate over all query_all results
+    for entry in query_all:
+        entry_info = {
+            "title": entry.videogame_title,
+            "platform": entry.videogame_platform,
+            "releasedate": entry.videogame_releasedate,
+            "publisher": entry.videogame_publisher
+        }
+        
+        # Combine all entries into the all_entries list
+        all_entries.append(entry_info)
+
+    response = {
+        "message": "These are all the videogame database entries",
+        "entries": all_entries
+    }
+    return jsonify(all_entries)
 
 
 @app.route('/videogames', methods=['POST'])
