@@ -15,15 +15,15 @@ from models import Videogame
 
 @app.route('/videogames', methods=['GET'])
 def videogame_main():
-    return "Welcome to the main videogames archive page!"
+    query_all = db.session.query(Videogame).all()
+    return f"These are the videogame database entries: {query_all}"
 
 
 @app.route('/videogames', methods=['POST'])
-# Successful POST request example: curl -X POST http://127.0.0.1:5000/videogames -H "Content-Type: application/json" -d '{"title":"Spiderman 2", "platform":"PlayStation"}'
+# Successful POST request example: curl -X POST http://127.0.0.1:5000/videogames -H "Content-Type: application/json" -d '{"title":"Spiderman 2", "platform":"PlayStation", "releasedate": "2004-06-28", "publisher": "Activision"}'
 # Inaccurate JSON example: curl -X POST http://127.0.0.1:5000/videogames -H "Content-Type: application/json" -d '{"name":"Spiderman 2", "platform":"PlayStation 2"}'
 
 def videogame_POST():
-    # try:
     if request.is_json:
         # Process the json data from the message body and store in data variable
         data = request.get_json()
@@ -71,12 +71,11 @@ def videogame_POST():
 def info_query(uuid):
     entry_info = db.session.query(Videogame).filter(Videogame.videogame_id == uuid).first()
     if entry_info:
-        # print(f"The requested ID is: {entry_info.videogame_id}\nThe title is: {entry_info.videogame_title}\nThe platform is: {entry_info.videogame_platform}")
-        videogame_query = "The requested ID is: {entry_info.videogame_id}\nThe title is: {entry_info.videogame_title}\nThe platform is: {entry_info.videogame_platform}\nThe release date is: {entry_info.videogame_releasedate}\nThe publisher is: {entry_info.videogame_publisher}"
-        return jsonify(videogame_query), 200 # OK
+        # videogame_query = "The requested ID is: {entry_info.videogame_id}\nThe title is: {entry_info.videogame_title}\nThe platform is: {entry_info.videogame_platform}\nThe release date is: {entry_info.videogame_releasedate}\nThe publisher is: {entry_info.videogame_publisher}"
+        return jsonify(entry_info), 200 # OK
 
     else:
-        query_notfound = "Entry not found."
+        query_notfound = {"message": "Entry not found."}
         return jsonify(query_notfound), 400 # Bad request
 
 @app.route('/videogames/<uuid>', methods=['DELETE'])
@@ -87,9 +86,10 @@ def delete_entry(uuid):
     if entry_info:
         db.session.delete(entry_info)
         db.session.commit()
-        query_deleted = "Entry has been deleted."
+        query_deleted = {"message": "Entry has been deleted."}
         return jsonify(query_deleted), 200 # OK
     else:
+        query_notfound = {"message": "Entry not found."}
         return jsonify(query_notfound), 400 # Bad request
 
 
