@@ -33,8 +33,7 @@ def videogame_main():
         all_entries.append(entry_info)
 
     response = {
-        "message": "These are all the videogame database entries",
-        "entries": all_entries
+        "items": all_entries
     }
     return jsonify(all_entries)
 
