@@ -51,6 +51,24 @@ def videogame_POST():
         error_message = {}
         error_message["endpoint"] = "/videogames"
 
+        if isinstance(data, list):
+            # Evaluate each item in the list
+            for item in data:
+                process_videogame(item)
+
+        elif isinstance(data, dict):
+            process_videogame(data)
+        else:
+            error_message["error"] = "Invalid JSON format"
+            return jsonify(error_message), 400
+
+        return jsonify(data), 201 # Created
+
+    # Return for invalid request format
+    error_message = {"item": "Invalid request format"}
+    return jsonify(error_message), 400
+    
+    def process_videogame(data):
         if "title" in data.keys() and "platform" in data.keys():
             # Save title and platform dict values into videogame variable. Constructor creates an empty arg. 
             videogame = Videogame()
@@ -81,7 +99,8 @@ def videogame_POST():
             return jsonify(error_message), 400 # Bad request
 
         else:
-            return 'Request not being understood. Check previous if and elif statements'
+            error_message = {"item": "Missing required fields"}
+            return jsonify(error_message)
 
 
 @app.route('/videogames/<uuid>', methods=['GET'])
