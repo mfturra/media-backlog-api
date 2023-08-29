@@ -19,12 +19,17 @@ provider "aws" {
 }
 
 resource "aws_instance" "media_backlog_api" {
-  ami           = "ami-053b0d53c279acc90"
-  instance_type = "t2.micro"
+    ami           = "ami-053b0d53c279acc90"
+    instance_type = "t2.micro"
 
-  tags = {
-    Name = "MediaBacklogAPI"
-  }
+    key_name = var.vs-flask-1.cer
+    
+    # root disk
+    root_block_device {
+      volume_size = "8"
+      volume_type = "gp2"
+      encrypted = true
+    }
 }
 
 module "vpc" {
@@ -36,13 +41,17 @@ module "vpc" {
     vpc_security_group_ids = [aws_security_group.sg-03f65b38a1d081a4f]
 }
 
-resource "aws_security_group" "flask web server sec group" {
+resource "aws_security_group" "flask_web_server_sec_group" {
+    name_prefix         = "flask_web_server_sec_group"
+    vpc_id              = module.vpc.vpc-02b3bc3edb2dc2583
 
     ingress {
         from_port       = 22
         to_port         = 22
         protocol        = "tcp"
-        cidr_blocks     = ["0.0.0.0/0"]
+        cidr_blocks     = [
+            "0.0.0.0/0",
+            ]
     }
 
     ingress {
