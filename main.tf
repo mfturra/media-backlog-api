@@ -27,3 +27,42 @@ resource "aws_instance" "media_backlog_api" {
   }
 }
 
+module "vpc" {
+    source              = "terraform-aws-modules/vpc/aws"
+    version             = "2.66.0"
+    
+    //name = "media-backlog-vpc"
+    //cidr = "10.0.0.0/16"
+    vpc_security_group_ids = [aws_security_group.sg-03f65b38a1d081a4f]
+}
+
+resource "aws_security_group" "flask web server sec group" {
+
+    ingress {
+        from_port       = 22
+        to_port         = 22
+        protocol        = "tcp"
+        cidr_blocks     = ["0.0.0.0/0"]
+    }
+
+    ingress {
+        from_port       = 80
+        to_port         = 80
+        protocol        = "tcp"
+        cidr_blocks     = ["0.0.0.0/0"]
+    }
+
+    ingress {
+        from_port       = 443
+        to_port         = 443
+        protocol        = "tcp"
+        cidr_blocks     = ["0.0.0.0/0"]
+    }
+
+    ingress {
+        from_port       = 5000
+        to_port         = 5000
+        protocol        = "tcp"
+        cidr_blocks     = ["0.0.0.0/0"]
+    }
+}
