@@ -16,8 +16,6 @@ provider "aws" {
 resource "aws_instance" "media_backlog_api" {
     ami           = "ami-053b0d53c279acc90"
     instance_type = "t2.micro"
-
-    key_name = var.vs-flask-1.cer
     
     # root disk
     root_block_device {
@@ -44,9 +42,18 @@ resource "local_file" "RSA_key" {
   filename  = "tfkey"
 }
 
+# AWS VPC Config
+resource "aws_vpc" "media_backlog_vpc" {
+  cidr_block  = "10.0.0.0/16"
+
+  tags = {
+    Name      = "TerraformVPC"
+  }
+}
+
 resource "aws_security_group" "flask_web_server_sec_group" {
     name_prefix         = "flask_web_server_sec_group"
-    vpc_id              = module.vpc.vpc-02b3bc3edb2dc2583
+    vpc_id              = aws_vpc.media_backlog_vpc.id
 
     ingress {
         from_port       = 22
@@ -86,15 +93,6 @@ resource "aws_security_group" "flask_web_server_sec_group" {
     }
 }
 
-# AWS VPC Config
-resource "aws_vpc" "media_backlog_vpc" {
-  cidr_block  = "10.0.0.0/16"
-
-  tags = {
-    Name      = "TerraformVPC"
-  }
-}
-
 # Public Subnet Config
 resource "aws_subnet" "PublicSubnet" {
   vpc_id      = aws_vpc.media_backlog_vpc.id
@@ -118,7 +116,7 @@ resource "aws_route_table" "PublicRT" {
 
 resource "aws_route" "PublicRoute" {
   route_table_id          = aws_route_table.PublicRT.id
-  dewtination_cidr_block  = "0.0.0.0/0"
+  destination_cidr_block  = "0.0.0.0/0"
   gateway_id              = aws_internet_gateway.igw.id
   }
 
