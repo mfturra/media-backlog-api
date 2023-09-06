@@ -27,15 +27,6 @@ resource "aws_instance" "media_backlog_api" {
     }
 }
 
-<<<<<<< Updated upstream
-module "vpc" {
-    source              = "terraform-aws-modules/vpc/aws"
-    version             = "2.66.0"
-    
-    //name = "media-backlog-vpc"
-    //cidr = "10.0.0.0/16"
-    vpc_security_group_ids = [aws_security_group.sg-03f65b38a1d081a4f]
-=======
 # Key pair config
 resource "aws_key_pair" "tf_key" {
   key_name      = "tf_key"
@@ -51,7 +42,6 @@ resource "tls_private_key" "RSA_key" {
 resource "local_file" "RSA_key" {
   content   = tls_private_key.RSA_key.private_key_pem
   filename  = "tfkey"
->>>>>>> Stashed changes
 }
 
 resource "aws_security_group" "flask_web_server_sec_group" {
@@ -87,8 +77,6 @@ resource "aws_security_group" "flask_web_server_sec_group" {
         protocol        = "tcp"
         cidr_blocks     = ["0.0.0.0/0"]
     }
-<<<<<<< Updated upstream
-=======
 
     egress {
       from_port       = 0
@@ -138,5 +126,4 @@ resource "aws_route" "PublicRoute" {
 resource "aws_route_table_association" "PublicRTAssociation" {
   subnet_id       = aws_subnet.PublicSubnet.id
   route_table_id  = aws_route_table.PublicRT.id
->>>>>>> Stashed changes
 }
