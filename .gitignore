@@ -198,6 +198,10 @@ override.tf.json
 .terraformrc
 terraform.rc
 
+# ansible files
+etc/ansible/aws_inventory.yml
+
+
 # build products...
 *.py[co]
 build

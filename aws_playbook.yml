@@ -1,0 +1,28 @@
+---
+- name: Configure web servers
+  hosts: webservers
+  remote_user: root
+
+  tasks:
+  - name: Download apache2 onto servers
+    ansible.builtin.yum:
+      name: httpd
+      state: latest
+  - name: Write the apache config file
+    ansible.builtin.template:
+      src: 
+
+- name: Update db servers
+  hosts: databases
+  remote_user: root
+
+  tasks:
+  - name: Ensure postgresql is at latest version
+    ansible.builtin.yum:
+      name: postgresql
+      state: latest
+
+  - name: Ensure that postgresql has started
+    ansible.builtin.service
+      name: postgresql
+      state: started
