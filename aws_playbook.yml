@@ -1,28 +1,102 @@
 ---
-- name: Configure web servers
+# Install system apt packages
+- name: configure web servers
   hosts: webservers
-  remote_user: root
-
+  become_method: sudo
   tasks:
-  - name: Download apache2 onto servers
-    ansible.builtin.yum:
+  - name: update cache & upgrade apt packages
+    apt: 
+      upgrade: dist
+      update_cache: yes
+      cache_valid_time: 43200
+    become: yes
+    
+  - name: install apache2
+    apt: 
+      name: apache2
+      state: latest
       name: httpd
       state: latest
-  - name: Write the apache config file
-    ansible.builtin.template:
-      src: 
-
-- name: Update db servers
-  hosts: databases
-  remote_user: root
-
-  tasks:
-  - name: Ensure postgresql is at latest version
-    ansible.builtin.yum:
-      name: postgresql
+  - name: create python3 venv and install necessary packages
+    pip:
+      name: 
+        - virtualenv
+        - -r /media-backlog-api/requirements.txt
+      state: present
+      virtualenv_command: /usr/local/bin/virtualenv /user/home/venvs/media-backlog-venv
+  - name: install python3-pip
+    apt:
+      name: python3-pip
       state: latest
+  - name: clone repo
+      git:
+        repo: 'https://github.com/{{ github_user }}/{{ app_name }}.git'
+        dest: /home/{{ ansible_ssh_user }}/{{ app_name }}
+        update: yes # Incorporates git pull in case repo already exists
+  - name: install modules in a virtualenv
+    pip:
+      requirements: /home/{{ ansible_ssh_user }}/{{ app_name }}/env
+      virtualenv: /home/{{ ansible_ssh_user }}/{{ app_name }}/env
+      virtualenv_python: python 3.9.6
+    pip:
+      requirements: /media-backlog-api/requirements.txt
+      virtualenv: /user/home/venvs/media-backlog-venv
+    cmd: virtualenv /user/
+      
+# Build postgresql config
+  - hosts: webservers
+    vars:
+      postgresql_version: "14"
+      postgresql_bin_path: "/usr/lib/postgresql/{{ postgresql_version }}/bin"
+      postgresql_data_dir: "/var/lib/postgresql/{{ [postgresql_version] }}/main"
+      ansible_ssh_pipelining: true
+    tasks:
+      - name: install postgresql packages
+        apt:
+          name:
+            - postgresql
+            - libpq-dev
+            - python3-psycopg2-binary
+          state: present
+      - name: check postgresql initialization
+        stat:
+          path: "{{ postgresql_data_dir }}/pg_hba.conf"
+        register: postgres_data
+      - name: empty data directory
+        file:
+          path: "{{ postgresql_data_dir }}"
+          state: absent
+        when: not postgres_data.stat.exists
+      - name: initialize postgresql
+        shell: "{{ postgresql_bin_path }}/initdb -D {{ postgres_data_dir }}"
+        become: true
+        become_user: postgres
+        when: not postgres_data.stat.exists
+      - name: start and enable service
+        service:
+          name: postgresql
+          state: started
+          enabled: true
 
-  - name: Ensure that postgresql has started
-    ansible.builtin.service
-      name: postgresql
-      state: started
+  # Run a quick test to verify that the site is working
+  - hosts: webservers
+    tasks: 
+    - name: get url
+      get_url:
+        url: http://{{ inventory_hostname }}
+        dest: /tmp/index.html
+    - name: read html
+      shell: cat /tmp/index.html
+      register: html_contents
+    - name: check for string in html
+      when: html_contents.stdout.find('hello') != -1
+      debug: msg="success!"
+  
+  - name: Copy Flask app to Ubuntu servers
+    copy:
+      src: /$pwd/app.py
+      dest: /home/{{ ansible_ssh_user }}/{{ app_name }}/env
+  
+
+
+
